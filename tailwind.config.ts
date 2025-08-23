@@ -52,6 +52,18 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				electric: {
+					DEFAULT: 'hsl(var(--electric))',
+					foreground: 'hsl(var(--electric-foreground))',
+					light: 'hsl(var(--electric-light))',
+					muted: 'hsl(var(--electric-muted))'
+				},
+				fuel: {
+					DEFAULT: 'hsl(var(--fuel))',
+					foreground: 'hsl(var(--fuel-foreground))',
+					light: 'hsl(var(--fuel-light))',
+					muted: 'hsl(var(--fuel-muted))'
+				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
