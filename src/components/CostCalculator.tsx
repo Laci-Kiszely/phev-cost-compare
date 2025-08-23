@@ -29,7 +29,11 @@ const CostCalculator = () => {
       !fuelConsumptionNum ||
       !electricityConsumptionNum ||
       !fuelPriceNum ||
-      !electricityPriceNum
+      !electricityPriceNum ||
+      fuelConsumptionNum <= 0 ||
+      electricityConsumptionNum <= 0 ||
+      fuelPriceNum <= 0 ||
+      electricityPriceNum <= 0
     ) {
       setResults(null);
       return;
