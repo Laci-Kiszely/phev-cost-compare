@@ -9,6 +9,7 @@ interface CostResults {
   electricityCost: number;
   petrolCost: number;
   petrolEquivalent: number;
+  fuelConsumptionEquivalent: number;
 }
 
 const CostCalculator = () => {
@@ -57,10 +58,14 @@ const CostCalculator = () => {
     // Petrol equivalent cost
     const petrolEquivalent = electricityCost / fuelConsumptionNum;
 
+    // Fuel consumption equivalent (what L/100km would cost the same as electricity)
+    const fuelConsumptionEquivalent = electricityCost / fuelPriceNum;
+
     setResults({
       electricityCost,
       petrolCost,
       petrolEquivalent,
+      fuelConsumptionEquivalent,
     });
   };
 
@@ -194,6 +199,16 @@ const CostCalculator = () => {
                   Electricity costs the same as petrol at
                 </p>
                 <p className="text-2xl font-bold text-foreground">€{results.petrolEquivalent.toFixed(2)}/liter</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-muted">
+              <CardContent className="p-6 text-center">
+                <h3 className="font-semibold text-muted-foreground mb-2">Fuel Consumption Equivalent</h3>
+                <p className="text-lg text-muted-foreground">
+                  Electricity cost is equivalent to
+                </p>
+                <p className="text-2xl font-bold text-foreground">{results.fuelConsumptionEquivalent.toFixed(1)} L/100km</p>
               </CardContent>
             </Card>
 
