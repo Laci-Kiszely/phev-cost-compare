@@ -13,10 +13,10 @@ interface CostResults {
 }
 
 const CostCalculator = () => {
-  const [fuelConsumption, setFuelConsumption] = useState<string>("");
-  const [electricityConsumption, setElectricityConsumption] = useState<string>("");
-  const [fuelPrice, setFuelPrice] = useState<string>("");
-  const [electricityPrice, setElectricityPrice] = useState<string>("");
+  const [fuelConsumption, setFuelConsumption] = useState<string>("6.1");
+  const [electricityConsumption, setElectricityConsumption] = useState<string>("17.27");
+  const [fuelPrice, setFuelPrice] = useState<string>("1.57");
+  const [electricityPrice, setElectricityPrice] = useState<string>("0.56");
   const [electricityPriceType, setElectricityPriceType] = useState<"kwh" | "minute">("kwh");
   const [results, setResults] = useState<CostResults | null>(null);
 
