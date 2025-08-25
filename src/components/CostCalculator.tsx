@@ -143,7 +143,10 @@ const CostCalculator = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="electricity-price-type">Electricity pricing</Label>
-              <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => setElectricityPriceType(value)}>
+              <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => {
+                setElectricityPriceType(value);
+                setElectricityPrice(value === "kwh" ? "0.56" : "0.075");
+              }}>
                 <SelectTrigger className="h-12">
                   <SelectValue />
                 </SelectTrigger>
