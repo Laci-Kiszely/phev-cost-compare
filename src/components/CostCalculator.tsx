@@ -145,6 +145,7 @@ const CostCalculator = () => {
               <Label htmlFor="electricity-price-type">Electricity pricing</Label>
               <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => {
                 setElectricityPriceType(value);
+                // Set appropriate default when switching pricing types
                 setElectricityPrice(value === "kwh" ? "0.56" : "0.075");
               }}>
                 <SelectTrigger className="h-12">
