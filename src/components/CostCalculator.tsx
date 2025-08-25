@@ -87,40 +87,6 @@ const CostCalculator = () => {
           </p>
         </div>
 
-        {/* Input Form */}
-        <Card className="shadow-[var(--shadow-soft)]">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Fuel className="h-5 w-5 text-fuel" />
-              Vehicle Consumption
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="fuel-consumption">Fuel consumption (L/100km)</Label>
-              <Input
-                id="fuel-consumption"
-                type="number"
-                placeholder="6.5"
-                value={fuelConsumption}
-                onChange={(e) => setFuelConsumption(e.target.value)}
-                className="text-lg h-12"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="electricity-consumption">Electricity consumption (kWh/100km)</Label>
-              <Input
-                id="electricity-consumption"
-                type="number"
-                placeholder="18.5"
-                value={electricityConsumption}
-                onChange={(e) => setElectricityConsumption(e.target.value)}
-                className="text-lg h-12"
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Pricing Form */}
         <Card className="shadow-[var(--shadow-soft)]">
           <CardHeader>
@@ -167,6 +133,40 @@ const CostCalculator = () => {
                 placeholder={electricityPriceType === "kwh" ? "0.25" : "0.35"}
                 value={electricityPrice}
                 onChange={(e) => setElectricityPrice(e.target.value)}
+                className="text-lg h-12"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Input Form */}
+        <Card className="shadow-[var(--shadow-soft)]">
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Fuel className="h-5 w-5 text-fuel" />
+              Vehicle Consumption
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="fuel-consumption">Fuel consumption (L/100km)</Label>
+              <Input
+                id="fuel-consumption"
+                type="number"
+                placeholder="6.5"
+                value={fuelConsumption}
+                onChange={(e) => setFuelConsumption(e.target.value)}
+                className="text-lg h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="electricity-consumption">Electricity consumption (kWh/100km)</Label>
+              <Input
+                id="electricity-consumption"
+                type="number"
+                placeholder="18.5"
+                value={electricityConsumption}
+                onChange={(e) => setElectricityConsumption(e.target.value)}
                 className="text-lg h-12"
               />
             </div>
