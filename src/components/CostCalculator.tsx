@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Zap, Fuel, Calculator } from "lucide-react";
+import FeedbackModal from "./FeedbackModal";
 
 interface CostResults {
   electricityCost: number;
@@ -236,6 +237,11 @@ const CostCalculator = () => {
             )}
           </div>
         )}
+        
+        {/* Feedback Button */}
+        <div className="flex justify-center pt-8 pb-4">
+          <FeedbackModal />
+        </div>
       </div>
     </div>
   );
