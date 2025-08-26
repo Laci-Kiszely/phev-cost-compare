@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,17 +68,17 @@ const FeedbackModal = () => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await supabase
-        .from('Feedback_Collecting_DB')
-        .insert({
-          name_of_poster: formData.name.trim(),
-          email_of_poster: formData.email.trim(),
-          title_feedback: formData.title.trim() || null,
-          comment_feedback: formData.feedback.trim(),
-        });
+      const { data, error } = await supabase.functions.invoke('feedback-submit', {
+        body: {
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          title: formData.title.trim() || null,
+          feedback: formData.feedback.trim(),
+        }
+      });
 
       if (error) {
-        throw error;
+        throw new Error(error.message || 'Failed to submit feedback');
       }
 
       toast({
@@ -124,6 +124,9 @@ const FeedbackModal = () => {
             <MessageCircle className="h-5 w-5 text-primary" />
             Send us your feedback
           </DialogTitle>
+          <DialogDescription>
+            We'd love to hear your thoughts, suggestions, or any issues you've encountered.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">

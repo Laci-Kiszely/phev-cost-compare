@@ -74,28 +74,28 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color =
-      itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
-      itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
-  })
-  .join("\n")}
-}
-`
-          )
-          .join("\n"),
-      }}
-    />
-  )
+  const styleContent = React.useMemo(() => {
+    return Object.entries(THEMES)
+      .map(([theme, prefix]) => {
+        const themeStyles = colorConfig
+          .map(([key, itemConfig]) => {
+            // Sanitize key to prevent CSS injection
+            const sanitizedKey = key.replace(/[^a-zA-Z0-9_-]/g, '');
+            const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
+            // Basic color validation to prevent injection
+            const sanitizedColor = color && /^#[0-9A-Fa-f]{3,6}$|^rgb\(|^rgba\(|^hsl\(|^hsla\(/.test(color) ? color : null;
+            return sanitizedColor ? `  --color-${sanitizedKey}: ${sanitizedColor};` : null;
+          })
+          .filter(Boolean)
+          .join('\n');
+        
+        return themeStyles ? `${prefix} [data-chart=${id}] {\n${themeStyles}\n}` : '';
+      })
+      .filter(Boolean)
+      .join('\n');
+  }, [colorConfig, id]);
+
+  return React.createElement('style', {}, styleContent);
 }
 
 const ChartTooltip = RechartsPrimitive.Tooltip
