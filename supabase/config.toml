@@ -2,6 +2,3 @@ project_id = "aknltelxmsattcjwhbwo"
 
 [functions.feedback-submit]
 verify_jwt = false
-
-[functions.log]
-verify_jwt = false

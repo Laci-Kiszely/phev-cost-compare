@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { usePageTracking } from "@/hooks/usePageTracking";
 import { supabase } from "@/integrations/supabase/client";
 import { MessageCircle } from "lucide-react";
 
@@ -26,7 +25,6 @@ const FeedbackModal = () => {
     feedback: "",
   });
   const { toast } = useToast();
-  const { logFormSubmission } = usePageTracking();
 
   const handleInputChange = (field: keyof FeedbackFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -82,14 +80,6 @@ const FeedbackModal = () => {
       if (error) {
         throw new Error(error.message || 'Failed to submit feedback');
       }
-
-      // Log form submission
-      await logFormSubmission('feedback', {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        title: formData.title.trim(),
-        feedback_length: formData.feedback.trim().length
-      });
 
       toast({
         title: "Feedback sent!",
