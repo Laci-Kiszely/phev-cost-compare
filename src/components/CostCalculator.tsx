@@ -16,6 +16,7 @@ interface CostResults {
 const CostCalculator = () => {
   const [fuelConsumption, setFuelConsumption] = useState<string>("6.1");
   const [electricityConsumption, setElectricityConsumption] = useState<string>("17.27");
+  const [chargingCapacity, setChargingCapacity] = useState<string>("3.6");
   const [fuelPrice, setFuelPrice] = useState<string>("1.5789");
   const [electricityPrice, setElectricityPrice] = useState<string>("0.56");
   const [electricityPriceType, setElectricityPriceType] = useState<"kwh" | "minute">("kwh");
@@ -24,16 +25,19 @@ const CostCalculator = () => {
   const calculateCosts = () => {
     const fuelConsumptionNum = parseFloat(fuelConsumption);
     const electricityConsumptionNum = parseFloat(electricityConsumption);
+    const chargingCapacityNum = parseFloat(chargingCapacity);
     const fuelPriceNum = parseFloat(fuelPrice);
     const electricityPriceNum = parseFloat(electricityPrice);
 
     if (
       !fuelConsumptionNum ||
       !electricityConsumptionNum ||
+      !chargingCapacityNum ||
       !fuelPriceNum ||
       !electricityPriceNum ||
       fuelConsumptionNum <= 0 ||
       electricityConsumptionNum <= 0 ||
+      chargingCapacityNum <= 0 ||
       fuelPriceNum <= 0 ||
       electricityPriceNum <= 0
     ) {
@@ -49,9 +53,8 @@ const CostCalculator = () => {
     if (electricityPriceType === "kwh") {
       electricityCost = electricityConsumptionNum * electricityPriceNum;
     } else {
-      // If price is per minute, we need to estimate charging time
-      // Assuming typical charging speed of 7kW for home charging
-      const chargingTimeHours = electricityConsumptionNum / 7;
+      // If price is per minute, we need to estimate charging time using the charging capacity
+      const chargingTimeHours = electricityConsumptionNum / chargingCapacityNum;
       const chargingTimeMinutes = chargingTimeHours * 60;
       electricityCost = chargingTimeMinutes * electricityPriceNum;
     }
@@ -72,7 +75,7 @@ const CostCalculator = () => {
 
   useEffect(() => {
     calculateCosts();
-  }, [fuelConsumption, electricityConsumption, fuelPrice, electricityPrice, electricityPriceType]);
+  }, [fuelConsumption, electricityConsumption, chargingCapacity, fuelPrice, electricityPrice, electricityPriceType]);
 
   return (
     <div className="min-h-screen bg-[var(--gradient-app)] p-4">
@@ -145,7 +148,7 @@ const CostCalculator = () => {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <Fuel className="h-5 w-5 text-fuel" />
-              Vehicle Consumption
+              Vehicle Data
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -168,6 +171,17 @@ const CostCalculator = () => {
                 placeholder="18.5"
                 value={electricityConsumption}
                 onChange={(e) => setElectricityConsumption(e.target.value)}
+                className="text-lg h-12"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="charging-capacity">Charging capacity (kW)</Label>
+              <Input
+                id="charging-capacity"
+                type="number"
+                placeholder="3.6"
+                value={chargingCapacity}
+                onChange={(e) => setChargingCapacity(e.target.value)}
                 className="text-lg h-12"
               />
             </div>
