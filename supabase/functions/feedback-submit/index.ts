@@ -1,9 +1,19 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-// Restrict CORS to known domains for security
+// Configure CORS for production - allow Lovable app domains
+const getAllowedOrigins = () => {
+  const origins = [
+    'https://aknltelxmsattcjwhbwo.lovable.app',
+    'http://localhost:5173', // for local development
+    'http://localhost:3000', // alternative local port
+  ];
+  return origins;
+};
+
 const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://aknltelxmsattcjwhbwo.lovable.app',
+  'Access-Control-Allow-Origin': '*', // Will be set dynamically below
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 // Simple rate limiting storage (in-memory for basic protection)
@@ -37,9 +47,19 @@ interface FeedbackData {
 }
 
 Deno.serve(async (req) => {
+  // Dynamic CORS handling
+  const origin = req.headers.get('origin');
+  const allowedOrigins = getAllowedOrigins();
+  const corsOrigin = allowedOrigins.includes(origin || '') ? origin : allowedOrigins[0];
+  
+  const dynamicCorsHeaders = {
+    ...corsHeaders,
+    'Access-Control-Allow-Origin': corsOrigin || '*',
+  };
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: dynamicCorsHeaders });
   }
 
   try {
@@ -53,14 +73,14 @@ Deno.serve(async (req) => {
       console.warn(`Rate limit exceeded for IP: ${clientIP}`);
       return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
         status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (req.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -69,7 +89,7 @@ Deno.serve(async (req) => {
     if (contentLength && parseInt(contentLength) > 10000) { // 10KB limit
       return new Response(JSON.stringify({ error: 'Request payload too large' }), {
         status: 413,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -79,21 +99,21 @@ Deno.serve(async (req) => {
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'Name is required' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (!email || !email.trim()) {
       return new Response(JSON.stringify({ error: 'Email is required' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (!feedback || !feedback.trim()) {
       return new Response(JSON.stringify({ error: 'Feedback is required' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -101,28 +121,28 @@ Deno.serve(async (req) => {
     if (name.trim().length > 100) {
       return new Response(JSON.stringify({ error: 'Name too long (max 100 characters)' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (email.trim().length > 255) {
       return new Response(JSON.stringify({ error: 'Email too long (max 255 characters)' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (title && title.trim().length > 200) {
       return new Response(JSON.stringify({ error: 'Title too long (max 200 characters)' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
     if (feedback.trim().length > 2000) {
       return new Response(JSON.stringify({ error: 'Feedback too long (max 2000 characters)' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -131,7 +151,7 @@ Deno.serve(async (req) => {
     if (!emailRegex.test(email.trim())) {
       return new Response(JSON.stringify({ error: 'Invalid email format' }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -155,7 +175,7 @@ Deno.serve(async (req) => {
       console.error('Database error:', error);
       return new Response(JSON.stringify({ error: 'Failed to save feedback' }), {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
@@ -163,14 +183,14 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ message: 'Feedback submitted successfully' }), {
       status: 200,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Error in feedback-submit function:', error);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...dynamicCorsHeaders, 'Content-Type': 'application/json' },
     });
   }
 });

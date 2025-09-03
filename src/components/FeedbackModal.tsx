@@ -68,6 +68,7 @@ const FeedbackModal = () => {
     setIsSubmitting(true);
 
     try {
+      console.log('Submitting feedback to Edge Function...');
       const { data, error } = await supabase.functions.invoke('feedback-submit', {
         body: {
           name: formData.name.trim(),
@@ -77,7 +78,10 @@ const FeedbackModal = () => {
         }
       });
 
+      console.log('Edge Function response:', { data, error });
+
       if (error) {
+        console.error('Supabase function error:', error);
         throw new Error(error.message || 'Failed to submit feedback');
       }
 
