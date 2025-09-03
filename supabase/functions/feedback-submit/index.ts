@@ -1,8 +1,32 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+// Restrict CORS to known domains for security
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://aknltelxmsattcjwhbwo.lovable.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+// Simple rate limiting storage (in-memory for basic protection)
+const rateLimitMap = new Map<string, { count: number; timestamp: number }>();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 5; // Max 5 requests per minute per IP
+
+// Rate limiting function
+function checkRateLimit(clientIP: string): boolean {
+  const now = Date.now();
+  const clientData = rateLimitMap.get(clientIP);
+  
+  if (!clientData || (now - clientData.timestamp) > RATE_LIMIT_WINDOW) {
+    rateLimitMap.set(clientIP, { count: 1, timestamp: now });
+    return true;
+  }
+  
+  if (clientData.count >= RATE_LIMIT_MAX_REQUESTS) {
+    return false;
+  }
+  
+  clientData.count++;
+  return true;
 }
 
 interface FeedbackData {
@@ -19,9 +43,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Get client IP for rate limiting
+    const clientIP = req.headers.get('x-forwarded-for') || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+
+    // Check rate limit
+    if (!checkRateLimit(clientIP)) {
+      console.warn(`Rate limit exceeded for IP: ${clientIP}`);
+      return new Response(JSON.stringify({ error: 'Too many requests. Please try again later.' }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     if (req.method !== 'POST') {
       return new Response(JSON.stringify({ error: 'Method not allowed' }), {
         status: 405,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Check Content-Length to prevent oversized payloads
+    const contentLength = req.headers.get('content-length');
+    if (contentLength && parseInt(contentLength) > 10000) { // 10KB limit
+      return new Response(JSON.stringify({ error: 'Request payload too large' }), {
+        status: 413,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }

@@ -16,27 +16,27 @@ export type Database = {
     Tables: {
       Feedback_Collecting_DB: {
         Row: {
-          comment_feedback: string | null
+          comment_feedback: string
           created_at: string
-          email_of_poster: string | null
+          email_of_poster: string
           id: number
-          name_of_poster: string | null
+          name_of_poster: string
           title_feedback: string | null
         }
         Insert: {
-          comment_feedback?: string | null
+          comment_feedback?: string
           created_at?: string
-          email_of_poster?: string | null
+          email_of_poster?: string
           id?: number
-          name_of_poster?: string | null
+          name_of_poster?: string
           title_feedback?: string | null
         }
         Update: {
-          comment_feedback?: string | null
+          comment_feedback?: string
           created_at?: string
-          email_of_poster?: string | null
+          email_of_poster?: string
           id?: number
-          name_of_poster?: string | null
+          name_of_poster?: string
           title_feedback?: string | null
         }
         Relationships: []

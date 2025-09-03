@@ -130,10 +130,13 @@ Full suite of 50+ reusable UI components including:
 ## 8. Known Limitations / TODOs
 
 ### Security Considerations
-- **No Authentication**: Application is completely public
-- **Open Edge Functions**: Feedback endpoint is public with potential for abuse
-- **RLS Policies**: Tables have RLS enabled but no policies defined
-- **Rate Limiting**: No rate limiting on feedback submissions
+✅ **Secure Database Access**: RLS is enabled on all tables with restrictive policies that block public access while allowing service role access.
+✅ **Input Validation**: Comprehensive server-side validation with length constraints, email format checks, and payload size limits.
+✅ **Rate Limiting**: Edge functions implement rate limiting (5 requests per minute per IP) to prevent abuse.
+✅ **CORS Restrictions**: CORS is restricted to the application domain instead of wildcard access.
+✅ **Database Constraints**: Tables have proper NOT NULL constraints, length limits, and email format validation at the database level.
+⚠️ **Public Edge Functions**: The feedback-submit function is configured with `verify_jwt = false` for public access, but includes rate limiting and validation.
+⚠️ **No Authentication**: The application doesn't require user authentication as it's designed for public feedback collection.
 
 ### Missing Features
 - **User Accounts**: No user registration or login system
