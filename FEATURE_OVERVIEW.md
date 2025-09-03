@@ -36,7 +36,9 @@ This is an **EV Cost Calculator** web application that allows users to compare t
 
 ### Core Components
 - **`CostCalculator`**: Main application component
+  - Vehicle selection dropdown with database integration
   - Form inputs for fuel/electricity prices and consumption rates
+  - Auto-fill vehicle data from database with manual override capability
   - Real-time calculation of costs per 100km
   - Results display with visual comparison cards
   - Savings indicator showing which option is cheaper
@@ -82,6 +84,15 @@ Full suite of 50+ reusable UI components including:
   - `title_feedback` (text, nullable)
   - `comment_feedback` (text, nullable, default: '')
 
+- **`Vehicle_Database`**:
+  - `id` (bigint, primary key, auto-generated)
+  - `created_at` (timestamp, default: now())
+  - `car_type` (text, nullable) - Vehicle make/model
+  - `fuel_consumption` (real, nullable) - L/100km
+  - `electro_consumption` (real, nullable) - kWh/100km
+  - `charging_capacity` (real, nullable) - kW
+  - `consumption_version` (text, nullable) - Version/variant description
+
 ### Relationships
 - Currently no foreign key relationships
 - Single table for feedback collection
@@ -95,8 +106,10 @@ Full suite of 50+ reusable UI components including:
    - Current fuel price (€/liter)
    - Electricity pricing type (per kWh or per minute)
    - Electricity price
-   - Vehicle fuel consumption (L/100km)
-   - Vehicle electricity consumption (kWh/100km)
+   - **Vehicle Selection** (new): Choose from pre-configured vehicles or manual input:
+     - Option A: Select vehicle from dropdown to auto-fill consumption data
+     - Option B: Manual entry of fuel consumption (L/100km), electricity consumption (kWh/100km), charging capacity (kW)
+   - User can modify any auto-filled values as needed
 3. **View Results**: Real-time calculation displays:
    - Cost per 100km for electricity
    - Cost per 100km for petrol
@@ -145,6 +158,7 @@ Full suite of 50+ reusable UI components including:
 - **Export Features**: No ability to save or export results
 - **Advanced Calculations**: No support for different charging speeds, time-of-use rates
 - **Localization**: Hard-coded to Euro currency and European units
+- **Vehicle Database Management**: No admin interface to add/edit vehicles in the database
 
 ### Technical Debt
 - **Large Components**: CostCalculator component could be broken into smaller parts
@@ -163,4 +177,7 @@ Full suite of 50+ reusable UI components including:
 - Add unit and integration tests
 - Support for multiple currencies and units
 - Time-of-use electricity pricing calculations
-- Vehicle-specific consumption databases
+- ✅ **Vehicle-specific consumption databases** (completed - Vehicle_Database integration)
+- Add admin interface for managing vehicle database entries
+- Implement search/filter functionality for vehicle selection
+- Add vehicle comparison features

@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Zap, Fuel, Calculator } from "lucide-react";
+import { Zap, Fuel, Calculator, Car } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import FeedbackModal from "./FeedbackModal";
 
 interface CostResults {
@@ -11,6 +12,16 @@ interface CostResults {
   petrolCost: number;
   petrolEquivalent: number;
   fuelConsumptionEquivalent: number;
+}
+
+interface Vehicle {
+  id: number;
+  car_type: string | null;
+  fuel_consumption: number | null;
+  electro_consumption: number | null;
+  charging_capacity: number | null;
+  consumption_version: string | null;
+  created_at: string;
 }
 
 const CostCalculator = () => {
@@ -21,6 +32,8 @@ const CostCalculator = () => {
   const [electricityPrice, setElectricityPrice] = useState<string>("0.56");
   const [electricityPriceType, setElectricityPriceType] = useState<"kwh" | "minute">("kwh");
   const [results, setResults] = useState<CostResults | null>(null);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [selectedVehicle, setSelectedVehicle] = useState<string>("");
 
   const calculateCosts = () => {
     const fuelConsumptionNum = parseFloat(fuelConsumption);
@@ -72,6 +85,43 @@ const CostCalculator = () => {
       fuelConsumptionEquivalent,
     });
   };
+
+  const fetchVehicles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('Vehicle_Database' as any)
+        .select('*')
+        .order('car_type', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching vehicles:', error);
+        return;
+      }
+      
+      if (data) {
+        setVehicles(data as unknown as Vehicle[]);
+      }
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+    }
+  };
+
+  const handleVehicleSelect = (vehicleId: string) => {
+    setSelectedVehicle(vehicleId);
+    
+    if (vehicleId) {
+      const vehicle = vehicles.find(v => v.id.toString() === vehicleId);
+      if (vehicle) {
+        setFuelConsumption(vehicle.fuel_consumption?.toString() || "");
+        setElectricityConsumption(vehicle.electro_consumption?.toString() || "");
+        setChargingCapacity(vehicle.charging_capacity?.toString() || "");
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchVehicles();
+  }, []);
 
   useEffect(() => {
     calculateCosts();
@@ -147,11 +197,27 @@ const CostCalculator = () => {
         <Card className="shadow-[var(--shadow-soft)]">
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Fuel className="h-5 w-5 text-fuel" />
+              <Car className="h-5 w-5 text-fuel" />
               Vehicle Data
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="vehicle-select">Select Vehicle (Optional)</Label>
+              <Select value={selectedVehicle} onValueChange={handleVehicleSelect}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Choose a vehicle to auto-fill data" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Manual input</SelectItem>
+                  {vehicles.map((vehicle) => (
+                    <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
+                      {vehicle.car_type || 'Unknown Vehicle'} {vehicle.consumption_version && `(${vehicle.consumption_version})`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="fuel-consumption">Fuel consumption (L/100km)</Label>
               <Input
