@@ -115,7 +115,7 @@ const FeedbackModal = () => {
           className="flex items-center gap-2 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-electric)]"
         >
           <MessageCircle className="h-4 w-4" />
-          Your feedback
+          Your feedback is welcome
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md mx-4 max-h-[90vh] overflow-y-auto">

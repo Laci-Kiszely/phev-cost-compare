@@ -252,8 +252,18 @@ const CostCalculator = () => {
           </div>
         )}
         
+        {/* Buy me a coffee button */}
+        <div className="flex justify-center pt-6">
+          <button
+            onClick={() => window.open('https://buy.stripe.com/00gbKXgBCgOPbYc146', '_blank')}
+            className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2"
+          >
+            ☕ Buy me a coffee
+          </button>
+        </div>
+
         {/* Feedback Button */}
-        <div className="flex justify-center pt-8 pb-4">
+        <div className="flex justify-center pt-4 pb-4">
           <FeedbackModal />
         </div>
       </div>
