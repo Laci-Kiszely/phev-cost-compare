@@ -109,7 +109,7 @@ const CostCalculator = () => {
   const handleVehicleSelect = (vehicleId: string) => {
     setSelectedVehicle(vehicleId);
     
-    if (vehicleId) {
+    if (vehicleId && vehicleId !== "manual") {
       const vehicle = vehicles.find(v => v.id.toString() === vehicleId);
       if (vehicle) {
         setFuelConsumption(vehicle.fuel_consumption?.toString() || "");
@@ -209,7 +209,7 @@ const CostCalculator = () => {
                   <SelectValue placeholder="Choose a vehicle to auto-fill data" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Manual input</SelectItem>
+                  <SelectItem value="manual">Manual input</SelectItem>
                   {vehicles.map((vehicle) => (
                     <SelectItem key={vehicle.id} value={vehicle.id.toString()}>
                       {vehicle.car_type || 'Unknown Vehicle'} {vehicle.consumption_version && `(${vehicle.consumption_version})`}
