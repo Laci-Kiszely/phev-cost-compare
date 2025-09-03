@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      Vehicle_Database: {
+        Row: {
+          car_type: string | null
+          charging_capacity: number | null
+          consumption_version: string | null
+          created_at: string
+          electro_consumption: number | null
+          fuel_consumption: number | null
+          id: number
+        }
+        Insert: {
+          car_type?: string | null
+          charging_capacity?: number | null
+          consumption_version?: string | null
+          created_at?: string
+          electro_consumption?: number | null
+          fuel_consumption?: number | null
+          id?: number
+        }
+        Update: {
+          car_type?: string | null
+          charging_capacity?: number | null
+          consumption_version?: string | null
+          created_at?: string
+          electro_consumption?: number | null
+          fuel_consumption?: number | null
+          id?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
