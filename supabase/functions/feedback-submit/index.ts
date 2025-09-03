@@ -1,13 +1,16 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // Configure CORS for production - allow Lovable app domains
-const getAllowedOrigins = () => {
-  const origins = [
-    'https://aknltelxmsattcjwhbwo.lovable.app',
-    'http://localhost:5173', // for local development
-    'http://localhost:3000', // alternative local port
-  ];
-  return origins;
+const isAllowedOrigin = (origin: string): boolean => {
+  if (!origin) return false;
+  
+  // Allow all Lovable domains (both production and sandbox)
+  return (
+    origin.endsWith('.lovable.app') ||
+    origin.endsWith('.sandbox.lovable.dev') ||
+    origin === 'http://localhost:5173' ||
+    origin === 'http://localhost:3000'
+  );
 };
 
 const corsHeaders = {
@@ -49,16 +52,19 @@ interface FeedbackData {
 Deno.serve(async (req) => {
   // Dynamic CORS handling
   const origin = req.headers.get('origin');
-  const allowedOrigins = getAllowedOrigins();
-  const corsOrigin = allowedOrigins.includes(origin || '') ? origin : allowedOrigins[0];
+  console.log('Request origin:', origin);
+  
+  const corsOrigin = isAllowedOrigin(origin || '') ? origin : '*';
+  console.log('Setting CORS origin to:', corsOrigin);
   
   const dynamicCorsHeaders = {
     ...corsHeaders,
-    'Access-Control-Allow-Origin': corsOrigin || '*',
+    'Access-Control-Allow-Origin': corsOrigin,
   };
 
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS preflight request');
     return new Response(null, { headers: dynamicCorsHeaders });
   }
 
