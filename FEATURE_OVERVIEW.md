@@ -36,12 +36,13 @@ This is an **EV Cost Calculator** web application that allows users to compare t
 
 ### Core Components
 - **`CostCalculator`**: Main application component
+  - **Currency Support**: Toggle between EUR and HUF with automatic default value updates
   - Vehicle selection dropdown with database integration
-  - Form inputs for fuel/electricity prices and consumption rates
+  - Form inputs for fuel/electricity prices and consumption rates (currency-aware)
   - Auto-fill vehicle data from database with manual override capability
-  - Real-time calculation of costs per 100km
-  - Results display with visual comparison cards
-  - Savings indicator showing which option is cheaper
+  - Real-time calculation of costs per 100km in selected currency
+  - Results display with visual comparison cards in chosen currency
+  - Savings indicator showing which option is cheaper (currency-formatted)
 
 - **`FeedbackModal`**: User feedback system
   - Modal dialog with form fields (name, email, title, feedback)
@@ -102,15 +103,19 @@ Full suite of 50+ reusable UI components including:
 
 ### Primary User Flow
 1. **Landing**: User arrives at the main calculator page (`/`)
-2. **Input Data**: User enters:
-   - Current fuel price (€/liter)
+2. **Currency Selection**: User can switch between EUR and HUF using toggle buttons in Current Prices section
+   - System automatically updates all currency displays and sets appropriate defaults:
+     - EUR: Fuel €1.5789/L, Electricity €0.56/kWh or €0.075/min
+     - HUF: Fuel 590 Ft/L, Electricity 200 Ft/kWh or 5 Ft/min
+3. **Input Data**: User enters:
+   - Current fuel price (in selected currency/liter)
    - Electricity pricing type (per kWh or per minute)
-   - Electricity price
-   - **Vehicle Selection** (new): Choose from pre-configured vehicles or manual input:
+   - Electricity price (in selected currency)
+   - **Vehicle Selection**: Choose from pre-configured vehicles or manual input:
      - Option A: Select vehicle from dropdown to auto-fill consumption data
      - Option B: Manual entry of fuel consumption (L/100km), electricity consumption (kWh/100km), charging capacity (kW)
    - User can modify any auto-filled values as needed
-3. **View Results**: Real-time calculation displays:
+4. **View Results**: Real-time calculation displays (in selected currency):
    - Cost per 100km for electricity
    - Cost per 100km for petrol
    - Petrol equivalent price
@@ -157,7 +162,7 @@ Full suite of 50+ reusable UI components including:
 - **Historical Data**: No tracking of previous calculations
 - **Export Features**: No ability to save or export results
 - **Advanced Calculations**: No support for different charging speeds, time-of-use rates
-- **Localization**: Hard-coded to Euro currency and European units
+- **Limited Localization**: Currently supports EUR and HUF currencies but lacks full localization
 - **Vehicle Database Management**: No admin interface to add/edit vehicles in the database
 
 ### Technical Debt
@@ -175,7 +180,8 @@ Full suite of 50+ reusable UI components including:
 - Add data export functionality (PDF, CSV)
 - Implement proper error boundaries and loading states
 - Add unit and integration tests
-- Support for multiple currencies and units
+- ✅ **Multi-currency support** (completed - EUR/HUF toggle with automatic default updates)
+- Support for additional currencies and units beyond EUR/HUF
 - Time-of-use electricity pricing calculations
 - ✅ **Vehicle-specific consumption databases** (completed - Vehicle_Database integration)
 - Add admin interface for managing vehicle database entries

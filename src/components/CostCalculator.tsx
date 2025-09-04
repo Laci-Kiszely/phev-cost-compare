@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { Zap, Fuel, Calculator, Car } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import FeedbackModal from "./FeedbackModal";
@@ -24,7 +25,10 @@ interface Vehicle {
   created_at: string;
 }
 
+type Currency = "EUR" | "HUF";
+
 const CostCalculator = () => {
+  const [currency, setCurrency] = useState<Currency>("EUR");
   const [fuelConsumption, setFuelConsumption] = useState<string>("6.1");
   const [electricityConsumption, setElectricityConsumption] = useState<string>("17.27");
   const [chargingCapacity, setChargingCapacity] = useState<string>("3.6");
@@ -34,6 +38,29 @@ const CostCalculator = () => {
   const [results, setResults] = useState<CostResults | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
+
+  // Currency formatting
+  const formatCurrency = (amount: number) => {
+    return currency === "EUR" ? `€${amount.toFixed(2)}` : `${amount.toFixed(2)} Ft`;
+  };
+
+  const getCurrencySymbol = () => {
+    return currency === "EUR" ? "€" : "Ft";
+  };
+
+  // Handle currency change
+  const handleCurrencyChange = (newCurrency: Currency) => {
+    setCurrency(newCurrency);
+    
+    // Set default values based on currency
+    if (newCurrency === "HUF") {
+      setFuelPrice("590.00");
+      setElectricityPrice(electricityPriceType === "kwh" ? "200.00" : "5");
+    } else {
+      setFuelPrice("1.5789");
+      setElectricityPrice(electricityPriceType === "kwh" ? "0.56" : "0.075");
+    }
+  };
 
   const calculateCosts = () => {
     const fuelConsumptionNum = parseFloat(fuelConsumption);
@@ -144,14 +171,34 @@ const CostCalculator = () => {
         {/* Pricing Form */}
         <Card className="shadow-[var(--shadow-soft)]">
           <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Zap className="h-5 w-5 text-electric" />
-              Current Prices
+            <CardTitle className="text-lg flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-electric" />
+                Current Prices
+              </div>
+              <div className="flex gap-1">
+                <Button
+                  variant={currency === "EUR" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleCurrencyChange("EUR")}
+                  className="text-xs px-2 py-1 h-7"
+                >
+                  EUR
+                </Button>
+                <Button
+                  variant={currency === "HUF" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleCurrencyChange("HUF")}
+                  className="text-xs px-2 py-1 h-7"
+                >
+                  Ft
+                </Button>
+              </div>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fuel-price">Fuel price (€/liter)</Label>
+              <Label htmlFor="fuel-price">Fuel price ({getCurrencySymbol()}/liter)</Label>
               <Input
                 id="fuel-price"
                 type="number"
@@ -165,8 +212,12 @@ const CostCalculator = () => {
               <Label htmlFor="electricity-price-type">Electricity pricing</Label>
               <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => {
                 setElectricityPriceType(value);
-                // Set appropriate default when switching pricing types
-                setElectricityPrice(value === "kwh" ? "0.56" : "0.075");
+                // Set appropriate default when switching pricing types based on currency
+                if (currency === "EUR") {
+                  setElectricityPrice(value === "kwh" ? "0.56" : "0.075");
+                } else {
+                  setElectricityPrice(value === "kwh" ? "200.00" : "5");
+                }
               }}>
                 <SelectTrigger className="h-12">
                   <SelectValue />
@@ -179,7 +230,7 @@ const CostCalculator = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="electricity-price">
-                Electricity price (€/{electricityPriceType === "kwh" ? "kWh" : "minute"})
+                Electricity price ({getCurrencySymbol()}/{electricityPriceType === "kwh" ? "kWh" : "minute"})
               </Label>
               <Input
                 id="electricity-price"
@@ -263,7 +314,7 @@ const CostCalculator = () => {
                   <Zap className="h-5 w-5 text-electric" />
                   <h3 className="font-semibold text-electric">100km on Electricity</h3>
                 </div>
-                <p className="text-3xl font-bold text-electric">€{results.electricityCost.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-electric">{formatCurrency(results.electricityCost)}</p>
               </CardContent>
             </Card>
 
@@ -273,7 +324,7 @@ const CostCalculator = () => {
                   <Fuel className="h-5 w-5 text-fuel" />
                   <h3 className="font-semibold text-fuel">100km on Petrol</h3>
                 </div>
-                <p className="text-3xl font-bold text-fuel">€{results.petrolCost.toFixed(2)}</p>
+                <p className="text-3xl font-bold text-fuel">{formatCurrency(results.petrolCost)}</p>
               </CardContent>
             </Card>
 
@@ -283,7 +334,7 @@ const CostCalculator = () => {
                 <p className="text-lg text-muted-foreground">
                   Electricity costs the same as petrol at
                 </p>
-                <p className="text-2xl font-bold text-foreground">€{results.petrolEquivalent.toFixed(2)}/liter</p>
+                <p className="text-2xl font-bold text-foreground">{formatCurrency(results.petrolEquivalent)}/liter</p>
               </CardContent>
             </Card>
 
@@ -302,7 +353,7 @@ const CostCalculator = () => {
               <Card className="bg-electric-light border-electric">
                 <CardContent className="p-4 text-center">
                   <p className="text-electric font-semibold">
-                    You save €{(results.petrolCost - results.electricityCost).toFixed(2)} per 100km with electricity!
+                    You save {formatCurrency(results.petrolCost - results.electricityCost)} per 100km with electricity!
                   </p>
                 </CardContent>
               </Card>
@@ -310,7 +361,7 @@ const CostCalculator = () => {
               <Card className="bg-fuel-light border-fuel">
                 <CardContent className="p-4 text-center">
                   <p className="text-fuel font-semibold">
-                    Petrol is €{(results.electricityCost - results.petrolCost).toFixed(2)} cheaper per 100km
+                    Petrol is {formatCurrency(results.electricityCost - results.petrolCost)} cheaper per 100km
                   </p>
                 </CardContent>
               </Card>
