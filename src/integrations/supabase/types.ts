@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      Default_Parameters: {
+        Row: {
+          created_at: string
+          id: number
+          variable_name: string | null
+          variable_value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          variable_name?: string | null
+          variable_value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          variable_name?: string | null
+          variable_value?: number | null
+        }
+        Relationships: []
+      }
       Feedback_Collecting_DB: {
         Row: {
           comment_feedback: string
