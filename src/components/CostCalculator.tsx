@@ -59,10 +59,13 @@ const CostCalculator = () => {
   // Fetch default parameters from database
   const fetchDefaultParameters = async () => {
     try {
+      console.log('Fetching default parameters...');
       const { data, error } = await supabase
         .from('Default_Parameters' as any)
         .select('*')
         .order('created_at', { ascending: false });
+      
+      console.log('Default parameters response:', { data, error });
       
       if (error) {
         console.error('Error fetching default parameters:', error);
