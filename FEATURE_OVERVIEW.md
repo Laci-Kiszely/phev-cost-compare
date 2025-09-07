@@ -94,6 +94,12 @@ Full suite of 50+ reusable UI components including:
   - `charging_capacity` (real, nullable) - kW
   - `consumption_version` (text, nullable) - Version/variant description
 
+- **`Default_Parameters`**:
+  - `id` (bigint, primary key, auto-generated)
+  - `created_at` (timestamp, default: now())
+  - `variable_name` (text, nullable) - Parameter identifier (e.g., "fuel_price_eur")
+  - `variable_value` (numeric, nullable) - Default value for the parameter
+
 ### Relationships
 - Currently no foreign key relationships
 - Single table for feedback collection
@@ -103,10 +109,13 @@ Full suite of 50+ reusable UI components including:
 
 ### Primary User Flow
 1. **Landing**: User arrives at the main calculator page (`/`)
+   - System fetches default pricing values from the Default_Parameters database table
+   - Values are loaded based on latest timestamp for each variable name
+   - Falls back to hardcoded defaults if database is empty
 2. **Currency Selection**: User can switch between EUR and HUF using toggle buttons in Current Prices section
-   - System automatically updates all currency displays and sets appropriate defaults:
-     - EUR: Fuel €1.5789/L, Electricity €0.56/kWh or €0.075/min
-     - HUF: Fuel 590 Ft/L, Electricity 200 Ft/kWh or 5 Ft/min
+   - System automatically updates all currency displays using database-driven defaults:
+     - Pulls values for: fuel_price_eur, fuel_price_huf, electricity_price_kwh_eur, electricity_price_kwh_huf, electricity_price_minute_eur, electricity_price_minute_huf
+     - Hardcoded fallbacks: EUR (Fuel €1.5789/L, Electricity €0.56/kWh or €0.075/min), HUF (Fuel 590 Ft/L, Electricity 200 Ft/kWh or 5 Ft/min)
 3. **Input Data**: User enters:
    - Current fuel price (in selected currency/liter)
    - Electricity pricing type (per kWh or per minute)

@@ -25,6 +25,13 @@ interface Vehicle {
   created_at: string;
 }
 
+interface DefaultParameter {
+  id: number;
+  variable_name: string | null;
+  variable_value: number | null;
+  created_at: string;
+}
+
 type Currency = "EUR" | "HUF";
 
 const CostCalculator = () => {
@@ -38,6 +45,7 @@ const CostCalculator = () => {
   const [results, setResults] = useState<CostResults | null>(null);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
+  const [defaultParams, setDefaultParams] = useState<Record<string, number>>({});
 
   // Currency formatting
   const formatCurrency = (amount: number) => {
@@ -48,17 +56,58 @@ const CostCalculator = () => {
     return currency === "EUR" ? "€" : "Ft";
   };
 
+  // Fetch default parameters from database
+  const fetchDefaultParameters = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('Default_Parameters' as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching default parameters:', error);
+        return;
+      }
+      
+      if (data) {
+        const params: Record<string, number> = {};
+        const processedVars = new Set<string>();
+        
+        // Get the latest value for each variable name
+        data.forEach((param: any) => {
+          if (param.variable_name && param.variable_value !== null && !processedVars.has(param.variable_name)) {
+            params[param.variable_name] = param.variable_value;
+            processedVars.add(param.variable_name);
+          }
+        });
+        
+        setDefaultParams(params);
+      }
+    } catch (error) {
+      console.error('Error fetching default parameters:', error);
+    }
+  };
+
+  // Get default value with fallback
+  const getDefaultValue = (paramName: string, fallback: number): number => {
+    return defaultParams[paramName] ?? fallback;
+  };
+
   // Handle currency change
   const handleCurrencyChange = (newCurrency: Currency) => {
     setCurrency(newCurrency);
     
-    // Set default values based on currency
+    // Set default values based on currency and database values
     if (newCurrency === "HUF") {
-      setFuelPrice("590.00");
-      setElectricityPrice(electricityPriceType === "kwh" ? "200.00" : "5");
+      setFuelPrice(getDefaultValue("fuel_price_huf", 590.00).toString());
+      setElectricityPrice(electricityPriceType === "kwh" ? 
+        getDefaultValue("electricity_price_kwh_huf", 200.00).toString() : 
+        getDefaultValue("electricity_price_minute_huf", 5).toString());
     } else {
-      setFuelPrice("1.5789");
-      setElectricityPrice(electricityPriceType === "kwh" ? "0.56" : "0.075");
+      setFuelPrice(getDefaultValue("fuel_price_eur", 1.5789).toString());
+      setElectricityPrice(electricityPriceType === "kwh" ? 
+        getDefaultValue("electricity_price_kwh_eur", 0.56).toString() : 
+        getDefaultValue("electricity_price_minute_eur", 0.075).toString());
     }
   };
 
@@ -148,7 +197,15 @@ const CostCalculator = () => {
 
   useEffect(() => {
     fetchVehicles();
+    fetchDefaultParameters();
   }, []);
+
+  // Initialize default values when defaultParams are loaded
+  useEffect(() => {
+    if (Object.keys(defaultParams).length > 0) {
+      handleCurrencyChange(currency);
+    }
+  }, [defaultParams]);
 
   useEffect(() => {
     calculateCosts();
@@ -210,15 +267,19 @@ const CostCalculator = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="electricity-price-type">Electricity pricing</Label>
-              <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => {
-                setElectricityPriceType(value);
-                // Set appropriate default when switching pricing types based on currency
-                if (currency === "EUR") {
-                  setElectricityPrice(value === "kwh" ? "0.56" : "0.075");
-                } else {
-                  setElectricityPrice(value === "kwh" ? "200.00" : "5");
-                }
-              }}>
+               <Select value={electricityPriceType} onValueChange={(value: "kwh" | "minute") => {
+                 setElectricityPriceType(value);
+                 // Set appropriate default when switching pricing types based on currency and database values
+                 if (currency === "EUR") {
+                   setElectricityPrice(value === "kwh" ? 
+                     getDefaultValue("electricity_price_kwh_eur", 0.56).toString() : 
+                     getDefaultValue("electricity_price_minute_eur", 0.075).toString());
+                 } else {
+                   setElectricityPrice(value === "kwh" ? 
+                     getDefaultValue("electricity_price_kwh_huf", 200.00).toString() : 
+                     getDefaultValue("electricity_price_minute_huf", 5).toString());
+                 }
+               }}>
                 <SelectTrigger className="h-12">
                   <SelectValue />
                 </SelectTrigger>
