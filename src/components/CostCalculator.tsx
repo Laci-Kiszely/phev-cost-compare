@@ -221,7 +221,7 @@ const CostCalculator = () => {
         {/* Header */}
         <div className="text-center space-y-2 pt-6">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <img src={logoImage} alt="EV Cost Calculator" className="h-8 w-8" />
+            <img src={logoImage} alt="EV Cost Calculator" className="h-9 w-9" />
             <h1 className="text-2xl font-bold text-foreground">EV Cost Calculator</h1>
           </div>
           <p className="text-muted-foreground text-sm">
