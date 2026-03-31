@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Zap, Fuel, Calculator, Car } from "lucide-react";
+import { Zap, Fuel, Car } from "lucide-react";
+import logoImage from "@/assets/favicon.png";
 import { supabase } from "@/integrations/supabase/client";
 import FeedbackModal from "./FeedbackModal";
 
