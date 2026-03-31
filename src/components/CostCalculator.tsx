@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Zap, Fuel, Calculator, Car } from "lucide-react";
+import { Zap, Fuel, Car } from "lucide-react";
+import logoImage from "@/assets/favicon.png";
 import { supabase } from "@/integrations/supabase/client";
 import FeedbackModal from "./FeedbackModal";
 
@@ -220,7 +221,7 @@ const CostCalculator = () => {
         {/* Header */}
         <div className="text-center space-y-2 pt-6">
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Calculator className="h-8 w-8 text-primary" />
+            <img src={logoImage} alt="EV Cost Calculator" className="h-8 w-8" />
             <h1 className="text-2xl font-bold text-foreground">EV Cost Calculator</h1>
           </div>
           <p className="text-muted-foreground text-sm">
