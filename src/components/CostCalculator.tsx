@@ -33,6 +33,16 @@ interface DefaultParameter {
   created_at: string;
 }
 
+interface Tariff {
+  id: number;
+  service_provider: string | null;
+  tariff_name: string | null;
+  country: string | null;
+  pricing_type: string | null;
+  electricity_price: number | null;
+  currency: string | null;
+}
+
 type Currency = "EUR" | "HUF";
 
 const CostCalculator = () => {
@@ -47,6 +57,8 @@ const CostCalculator = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
   const [defaultParams, setDefaultParams] = useState<Record<string, number>>({});
+  const [tariffs, setTariffs] = useState<Tariff[]>([]);
+  const [selectedTariff, setSelectedTariff] = useState<string>("");
 
   // Currency formatting
   const formatCurrency = (amount: number) => {
