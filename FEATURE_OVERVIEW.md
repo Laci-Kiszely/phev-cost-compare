@@ -100,10 +100,15 @@ Full suite of 50+ reusable UI components including:
   - `variable_name` (text, nullable) - Parameter identifier (e.g., "fuel_price_eur")
   - `variable_value` (numeric, nullable) - Default value for the parameter
 
-### Relationships
-- Currently no foreign key relationships
-- Single table for feedback collection
-- No user authentication system implemented
+- **`Tariff_Database`**:
+  - `id` (bigint, primary key, auto-generated)
+  - `created_at` (timestamp, default: now())
+  - `service_provider` (text, nullable) - e.g. "MOL Plugee", "Ionity"
+  - `tariff_name` (text, nullable) - e.g. "Basic", "Premium"
+  - `country` (text, nullable) - e.g. "HU", "DE"
+  - `pricing_type` (text, nullable) - "per_kwh" or "per_min"
+  - `electricity_price` (numeric, nullable) - Price in the respective unit
+  - `currency` (text, nullable) - "EUR" or "HUF"
 
 ## 6. User Flows
 
