@@ -38,8 +38,10 @@ This is an **EV Cost Calculator** web application that allows users to compare t
 - **`CostCalculator`**: Main application component
   - **Currency Support**: Toggle between EUR and HUF with automatic default value updates
   - Vehicle selection dropdown with database integration
+  - **Tariff selection dropdown** with database integration (filtered by currency)
   - Form inputs for fuel/electricity prices and consumption rates (currency-aware)
   - Auto-fill vehicle data from database with manual override capability
+  - Auto-fill electricity pricing type and price from selected tariff
   - Real-time calculation of costs per 100km in selected currency
   - Results display with visual comparison cards in chosen currency
   - Savings indicator showing which option is cheaper (currency-formatted)
