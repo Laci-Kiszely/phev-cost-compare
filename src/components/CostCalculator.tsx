@@ -314,6 +314,22 @@ const CostCalculator = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="tariff-select">Select Tariff (Optional)</Label>
+              <Select value={selectedTariff} onValueChange={handleTariffSelect}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Choose a tariff to auto-fill pricing" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual input</SelectItem>
+                  {filteredTariffs.map((tariff) => (
+                    <SelectItem key={tariff.id} value={tariff.id.toString()}>
+                      {tariff.service_provider || 'Unknown'} - {tariff.tariff_name || 'Unknown'} ({tariff.country || '?'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="fuel-price">Fuel price ({getCurrencySymbol()}/liter)</Label>
               <Input
                 id="fuel-price"
