@@ -62,6 +62,39 @@ export type Database = {
         }
         Relationships: []
       }
+      Tariff_Database: {
+        Row: {
+          country: string | null
+          created_at: string
+          currency: string | null
+          electricity_price: number | null
+          id: number
+          pricing_type: string | null
+          service_provider: string | null
+          tariff_name: string | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          electricity_price?: number | null
+          id?: number
+          pricing_type?: string | null
+          service_provider?: string | null
+          tariff_name?: string | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          currency?: string | null
+          electricity_price?: number | null
+          id?: number
+          pricing_type?: string | null
+          service_provider?: string | null
+          tariff_name?: string | null
+        }
+        Relationships: []
+      }
       Vehicle_Database: {
         Row: {
           car_type: string | null

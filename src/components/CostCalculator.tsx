@@ -33,6 +33,16 @@ interface DefaultParameter {
   created_at: string;
 }
 
+interface Tariff {
+  id: number;
+  service_provider: string | null;
+  tariff_name: string | null;
+  country: string | null;
+  pricing_type: string | null;
+  electricity_price: number | null;
+  currency: string | null;
+}
+
 type Currency = "EUR" | "HUF";
 
 const CostCalculator = () => {
@@ -47,6 +57,8 @@ const CostCalculator = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [selectedVehicle, setSelectedVehicle] = useState<string>("");
   const [defaultParams, setDefaultParams] = useState<Record<string, number>>({});
+  const [tariffs, setTariffs] = useState<Tariff[]>([]);
+  const [selectedTariff, setSelectedTariff] = useState<string>("");
 
   // Currency formatting
   const formatCurrency = (amount: number) => {
@@ -100,6 +112,7 @@ const CostCalculator = () => {
   // Handle currency change
   const handleCurrencyChange = (newCurrency: Currency) => {
     setCurrency(newCurrency);
+    setSelectedTariff(""); // Reset tariff selection when currency changes
     
     // Set default values based on currency and database values
     if (newCurrency === "HUF") {
@@ -199,9 +212,51 @@ const CostCalculator = () => {
     }
   };
 
+  const fetchTariffs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('Tariff_Database' as any)
+        .select('*')
+        .order('service_provider', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching tariffs:', error);
+        return;
+      }
+      
+      if (data) {
+        setTariffs(data as unknown as Tariff[]);
+      }
+    } catch (error) {
+      console.error('Error fetching tariffs:', error);
+    }
+  };
+
+  const handleTariffSelect = (tariffId: string) => {
+    setSelectedTariff(tariffId);
+    
+    if (tariffId && tariffId !== "manual") {
+      const tariff = tariffs.find(t => t.id.toString() === tariffId);
+      if (tariff) {
+        if (tariff.pricing_type === "per_kwh") {
+          setElectricityPriceType("kwh");
+        } else if (tariff.pricing_type === "per_min") {
+          setElectricityPriceType("minute");
+        }
+        if (tariff.electricity_price !== null) {
+          setElectricityPrice(tariff.electricity_price.toString());
+        }
+      }
+    }
+  };
+
+  // Filter tariffs by current currency
+  const filteredTariffs = tariffs.filter(t => t.currency === currency);
+
   useEffect(() => {
     fetchVehicles();
     fetchDefaultParameters();
+    fetchTariffs();
   }, []);
 
   // Initialize default values when defaultParams are loaded
@@ -258,6 +313,22 @@ const CostCalculator = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="tariff-select">Select Tariff (Optional)</Label>
+              <Select value={selectedTariff} onValueChange={handleTariffSelect}>
+                <SelectTrigger className="h-12">
+                  <SelectValue placeholder="Choose a tariff to auto-fill pricing" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual">Manual input</SelectItem>
+                  {filteredTariffs.map((tariff) => (
+                    <SelectItem key={tariff.id} value={tariff.id.toString()}>
+                      {tariff.service_provider || 'Unknown'} - {tariff.tariff_name || 'Unknown'} ({tariff.country || '?'})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="fuel-price">Fuel price ({getCurrencySymbol()}/liter)</Label>
               <Input

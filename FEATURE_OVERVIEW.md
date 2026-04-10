@@ -38,8 +38,10 @@ This is an **EV Cost Calculator** web application that allows users to compare t
 - **`CostCalculator`**: Main application component
   - **Currency Support**: Toggle between EUR and HUF with automatic default value updates
   - Vehicle selection dropdown with database integration
+  - **Tariff selection dropdown** with database integration (filtered by currency)
   - Form inputs for fuel/electricity prices and consumption rates (currency-aware)
   - Auto-fill vehicle data from database with manual override capability
+  - Auto-fill electricity pricing type and price from selected tariff
   - Real-time calculation of costs per 100km in selected currency
   - Results display with visual comparison cards in chosen currency
   - Savings indicator showing which option is cheaper (currency-formatted)
@@ -100,10 +102,15 @@ Full suite of 50+ reusable UI components including:
   - `variable_name` (text, nullable) - Parameter identifier (e.g., "fuel_price_eur")
   - `variable_value` (numeric, nullable) - Default value for the parameter
 
-### Relationships
-- Currently no foreign key relationships
-- Single table for feedback collection
-- No user authentication system implemented
+- **`Tariff_Database`**:
+  - `id` (bigint, primary key, auto-generated)
+  - `created_at` (timestamp, default: now())
+  - `service_provider` (text, nullable) - e.g. "MOL Plugee", "Ionity"
+  - `tariff_name` (text, nullable) - e.g. "Basic", "Premium"
+  - `country` (text, nullable) - e.g. "HU", "DE"
+  - `pricing_type` (text, nullable) - "per_kwh" or "per_min"
+  - `electricity_price` (numeric, nullable) - Price in the respective unit
+  - `currency` (text, nullable) - "EUR" or "HUF"
 
 ## 6. User Flows
 
