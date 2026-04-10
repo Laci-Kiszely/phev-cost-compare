@@ -112,6 +112,7 @@ const CostCalculator = () => {
   // Handle currency change
   const handleCurrencyChange = (newCurrency: Currency) => {
     setCurrency(newCurrency);
+    setSelectedTariff(""); // Reset tariff selection when currency changes
     
     // Set default values based on currency and database values
     if (newCurrency === "HUF") {
@@ -211,9 +212,51 @@ const CostCalculator = () => {
     }
   };
 
+  const fetchTariffs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('Tariff_Database' as any)
+        .select('*')
+        .order('service_provider', { ascending: true });
+      
+      if (error) {
+        console.error('Error fetching tariffs:', error);
+        return;
+      }
+      
+      if (data) {
+        setTariffs(data as unknown as Tariff[]);
+      }
+    } catch (error) {
+      console.error('Error fetching tariffs:', error);
+    }
+  };
+
+  const handleTariffSelect = (tariffId: string) => {
+    setSelectedTariff(tariffId);
+    
+    if (tariffId && tariffId !== "manual") {
+      const tariff = tariffs.find(t => t.id.toString() === tariffId);
+      if (tariff) {
+        if (tariff.pricing_type === "per_kwh") {
+          setElectricityPriceType("kwh");
+        } else if (tariff.pricing_type === "per_min") {
+          setElectricityPriceType("minute");
+        }
+        if (tariff.electricity_price !== null) {
+          setElectricityPrice(tariff.electricity_price.toString());
+        }
+      }
+    }
+  };
+
+  // Filter tariffs by current currency
+  const filteredTariffs = tariffs.filter(t => t.currency === currency);
+
   useEffect(() => {
     fetchVehicles();
     fetchDefaultParameters();
+    fetchTariffs();
   }, []);
 
   // Initialize default values when defaultParams are loaded
